@@ -4,7 +4,7 @@ import styles from './banner.module.css'
 
 type BannerProps = {
   buttonText: string
-  onClickHandler: (e: React.MouseEvent<HTMLButtonElement>) => void
+  onClickHandler: () => void
 }
 
 const Banner = (props: BannerProps) => {

@@ -9,9 +9,7 @@ import React from 'react'
 const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
-  const handleOnBannerButtonClick = (
-    e: React.MouseEvent<HTMLButtonElement>,
-  ) => {
+  const handleOnBannerButtonClick = () => {
     console.log('clicked the banner button')
   }
 
