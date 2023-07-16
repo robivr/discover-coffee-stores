@@ -1,9 +1,12 @@
 import React from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
-import { GetStaticPropsContext } from 'next'
 
-import coffeeStoresData from '../../data/coffee-stores.json'
+import coffeeStoresData from '@/data/coffee-stores.json'
+import Head from 'next/head'
+
+import styles from '@/styles/coffee-store.module.css'
+import Image from 'next/image'
 
 export function getStaticProps({ params }: { params: { id: string } }) {
   console.log('params', params)
@@ -21,7 +24,7 @@ export function getStaticPaths() {
     paths: coffeeStoresData.map(({ id }) => ({
       params: { id: id.toString() },
     })),
-    fallback: false,
+    fallback: true,
   }
 }
 
@@ -32,23 +35,64 @@ type CoffeeStoreProps = {
     href: string
     id: number
     address: string
+    neighbourhood: string
   }
 }
 
 const CoffeeStore = (props: CoffeeStoreProps) => {
-  console.log('CoffeeStore props', props)
   const router = useRouter()
-  const { id } = router.query
-  console.log({ router })
+
+  if (router.isFallback) {
+    return <div>Loading ...</div>
+  }
+
+  const { address, href, id, imgUrl, name, neighbourhood } = props.coffeeStore
+
+  const handleUpvoteButton = () => {}
 
   return (
-    <div>
-      coffee-store page {id}
-      <Link href="/">Back to home</Link>
-      <Link href="/coffee-store/2">Go to dynamic page</Link>
-      <Link href="/courses/nextjs">Go to NextJS page</Link>
-      <p>{props.coffeeStore.address}</p>
-      <p>{props.coffeeStore.name}</p>
+    <div className={styles.layout}>
+      <Head>
+        <title>{name}</title>
+      </Head>
+      <div className={styles.container}>
+        <div className={styles.col1}>
+          <Link href="/">
+            <div className={styles.backToHomeLink}>Back to home</div>
+          </Link>
+          <div className={styles.nameWrapper}>
+            <h1 className={styles.name}>{name}</h1>
+          </div>
+          <Image src={imgUrl} width={600} height={600} alt={name} />
+        </div>
+        <div className={`${styles.col2} glass`}>
+          <div className={styles.iconWrapper}>
+            <Image
+              src="/static/icons/places.svg"
+              width={24}
+              height={24}
+              alt=""
+            />
+            <p className={styles.text}>{address}</p>
+          </div>
+          <div className={styles.iconWrapper}>
+            <Image
+              src="/static/icons/nearMe.svg"
+              width={24}
+              height={24}
+              alt=""
+            />
+            <p className={styles.text}>{neighbourhood}</p>
+          </div>
+          <div className={styles.iconWrapper}>
+            <Image src="/static/icons/star.svg" width={24} height={24} alt="" />
+            <p className={styles.text}>1</p>
+          </div>
+          <button className={styles.upvoteButton} onClick={handleUpvoteButton}>
+            Upvote
+          </button>
+        </div>
+      </div>
     </div>
   )
 }
