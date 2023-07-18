@@ -3,7 +3,7 @@ import { createApi } from 'unsplash-js'
 import { CoffeeStore, FourSquareResult } from '@/types'
 
 const unsplash = createApi({
-  accessKey: process.env.UNSPLASH_ACCESS_KEY as string,
+  accessKey: process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY as string,
 })
 
 const getUrlForCoffeeStores = (
@@ -18,34 +18,33 @@ const getListOfCoffeeStorePhotos = async () => {
   const photos = await unsplash.search.getPhotos({
     query: 'coffee shop',
     page: 1,
-    perPage: 30,
+    perPage: 40,
   })
 
   const unsplashResults = photos.response?.results.map(
     (result) => result.urls['small'],
   )
-  console.log('unsplash', unsplashResults)
+  // console.log('unsplash', unsplashResults)
 
   return unsplashResults
 }
 
-export const fetchCoffeeStores = async (): Promise<CoffeeStore[]> => {
+export const fetchCoffeeStores = async (
+  latLong = '43.72722099443159%2C-79.45272353965996',
+  limit = 6,
+): Promise<CoffeeStore[]> => {
   const photos = await getListOfCoffeeStorePhotos()
 
   const options = {
     method: 'GET',
     headers: {
       accept: 'application/json',
-      Authorization: process.env.FOURSQUARE_API_KEY as string,
+      Authorization: process.env.NEXT_PUBLIC_FOURSQUARE_API_KEY as string,
     },
   }
 
   const response = await fetch(
-    getUrlForCoffeeStores(
-      '43.72722099443159%2C-79.45272353965996',
-      'coffee',
-      16,
-    ),
+    getUrlForCoffeeStores(latLong, 'coffee', limit),
     options,
   )
   const data = await response.json()
