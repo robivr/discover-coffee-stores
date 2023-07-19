@@ -1,8 +1,10 @@
-import React from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import Head from 'next/head'
 import Image from 'next/image'
+import { StoreContext } from '@/store/store-context'
+import { isEmpty } from '@/utils'
 
 import { fetchCoffeeStores } from '@/lib/coffee-stores'
 import { CoffeeStore } from '@/types'
@@ -37,14 +39,34 @@ type CoffeeStoreProps = {
   coffeeStore: CoffeeStore
 }
 
-const CoffeeStore = (props: CoffeeStoreProps) => {
+const CoffeeStore = (initialProps: CoffeeStoreProps) => {
   const router = useRouter()
+
+  const id = router.query.id
+
+  const [coffeeStore, setCoffeeStore] = useState(initialProps.coffeeStore)
+
+  const {
+    state: { coffeeStores },
+  } = useContext(StoreContext)
+
+  useEffect(() => {
+    if (isEmpty(initialProps.coffeeStore)) {
+      if (coffeeStores.length > 0) {
+        const findCoffeeStoreById = coffeeStores.find(
+          (coffeeStore: CoffeeStore) => coffeeStore.id.toString() === id,
+        ) as CoffeeStore
+
+        setCoffeeStore(findCoffeeStoreById)
+      }
+    }
+  }, [coffeeStores, id, initialProps.coffeeStore])
 
   if (router.isFallback) {
     return <div>Loading ...</div>
   }
 
-  const { imgUrl, name, address, locality } = props.coffeeStore
+  const { imgUrl, name, address, locality } = coffeeStore
 
   const handleUpvoteButton = () => {}
 

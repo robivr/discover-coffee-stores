@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import Head from 'next/head'
 import Image from 'next/image'
+import { ACTION_TYPES, StoreContext } from '@/store/store-context'
 
 import styles from '@/styles/Home.module.css'
 import Banner from '@/components/banner'
@@ -26,11 +27,13 @@ export async function getStaticProps() {
 }
 
 export default function Home(props: HomeProps) {
-  const [coffeeStores, setCoffeeStores] = useState<CoffeeStore[]>([])
+  const { state, dispatch } = useContext(StoreContext)
+  const { latLong, coffeeStores } = state
+
   const [coffeeStoresError, setCoffeeStoresError] = useState<null | string>(
     null,
   )
-  const { latLong, locationErrorMsg, isFindingLocation, handleTrackLocation } =
+  const { locationErrorMsg, isFindingLocation, handleTrackLocation } =
     useTrackLocation()
 
   console.log({ latLong, locationErrorMsg })
@@ -41,7 +44,12 @@ export default function Home(props: HomeProps) {
         try {
           const fetchedCoffeeStores = await fetchCoffeeStores(latLong, 30)
           console.log({ fetchedCoffeeStores })
-          setCoffeeStores(fetchedCoffeeStores)
+          dispatch({
+            type: ACTION_TYPES.SET_COFFEE_STORES,
+            payload: {
+              coffeeStores: fetchedCoffeeStores,
+            },
+          })
         } catch (err) {
           console.log('error fetching nearby stores', err)
           setCoffeeStoresError(`Can't find nearby stores ${err}`)
@@ -50,7 +58,7 @@ export default function Home(props: HomeProps) {
     }
 
     fetchNearbyStores()
-  }, [latLong])
+  }, [latLong, dispatch])
 
   const handleOnBannerButtonClick = () => {
     console.log('clicked the banner button')
