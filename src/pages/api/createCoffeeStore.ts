@@ -1,73 +1,62 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-
-import Airtable from 'airtable'
-const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(
-  process.env.AIRTABLE_BASE_KEY as string,
-)
-
-const table = base('coffee-stores')
-console.log(table)
-
-type CoffeeStoreRecord = {
-  imgUrl: string
-  name: string
-  id: string
-  address: string
-  locality: string
-  rating: number
-}
+import { CoffeeStoreRecord } from '@/types'
+import { getMinifiedRecords, table } from '@/lib/airtable'
 
 type Message = {
   error?: string
   message?: string
-  // [x: string]: any
 }
 
 const createCoffeeStore = async (
   req: NextApiRequest,
   res: NextApiResponse<CoffeeStoreRecord[] | Message>,
 ) => {
-  console.log('request', req.body)
-
   if (req.method === 'POST') {
+    const { id, name, address, locality, rating, imgUrl } = req.body
+
+    if (!id) {
+      res.status(400).json({ message: 'id is missing' })
+      return
+    }
+
     try {
       const findCoffeeStoreRecords = await table
         .select({
-          filterByFormula: `id="2"`,
+          filterByFormula: `id=${id}`,
         })
         .firstPage()
 
-      const records = findCoffeeStoreRecords.map((record) => {
-        return { ...record.fields } as CoffeeStoreRecord
-      })
-
-      console.log({ findCoffeeStoreRecords })
-
       if (findCoffeeStoreRecords.length > 0) {
+        const records = getMinifiedRecords(findCoffeeStoreRecords)
         res.json(records)
       } else {
-        const createRecords = await table.create([
-          {
-            fields: {
-              id: '2',
-              name: 'My favorite coffee store',
-              address: 'road 5',
-              locality: 'New York',
-              rating: 200,
-              imgUrl: 'some-image.png',
+        if (id && name) {
+          const createRecords = await table.create([
+            {
+              fields: {
+                id,
+                name,
+                address,
+                locality,
+                rating,
+                imgUrl,
+              },
             },
-          },
-        ])
+          ])
 
-        const records = createRecords.map((record) => {
-          return { ...record.fields } as CoffeeStoreRecord
-        })
+          const records = getMinifiedRecords(createRecords)
 
-        res.json(records)
+          res.json(records)
+        } else {
+          res.status(400).json({ message: 'id or name is missing' })
+        }
       }
-    } catch (err) {
-      console.error('Error finding store', err)
-      res.status(500).json({ error: 'Something went wrong' })
+    } catch (err: any) {
+      console.error('Error creating or finding a store', err)
+      res.status(500).json({
+        message: 'Error creating or finding a store',
+        error: err.message,
+      })
     }
   }
 }

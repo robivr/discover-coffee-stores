@@ -1,10 +1,17 @@
-export type CoffeeStore = {
+export type CoffeeStoreBase = {
   name: string
   imgUrl: string
-  href: string
   id: string
   address: string
   locality: string
+}
+
+export type CoffeeStore = CoffeeStoreBase & {
+  href: string
+}
+
+export type CoffeeStoreRecord = CoffeeStoreBase & {
+  rating: number
 }
 
 export type FourSquareResult = {
