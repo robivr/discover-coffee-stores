@@ -50,15 +50,46 @@ const CoffeeStore = (initialProps: CoffeeStoreProps) => {
     state: { coffeeStores },
   } = useContext(StoreContext)
 
+  const handleCreateCoffeeStore = async (coffeeStore: CoffeeStore) => {
+    try {
+      const { id, name, rating, imgUrl, locality, address } = coffeeStore
+
+      const response = await fetch('/api/createCoffeeStore', {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id,
+          name,
+          rating: rating || 0,
+          imgUrl,
+          locality: locality || '',
+          address: address || '',
+        }),
+      })
+
+      const dbCoffeeStore = await response.json()
+      console.log(dbCoffeeStore)
+    } catch (err) {
+      console.error('Error creating coffee store', err)
+    }
+  }
+
   useEffect(() => {
     if (isEmpty(initialProps.coffeeStore)) {
       if (coffeeStores.length > 0) {
         const findCoffeeStoreById = coffeeStores.find(
           (coffeeStore: CoffeeStore) => coffeeStore.id.toString() === id,
-        ) as CoffeeStore
+        ) as CoffeeStore | undefined
 
-        setCoffeeStore(findCoffeeStoreById)
+        if (findCoffeeStoreById) {
+          setCoffeeStore(findCoffeeStoreById)
+          handleCreateCoffeeStore(findCoffeeStoreById)
+        }
       }
+    } else {
+      handleCreateCoffeeStore(initialProps.coffeeStore)
     }
   }, [coffeeStores, id, initialProps.coffeeStore])
 

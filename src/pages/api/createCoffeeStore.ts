@@ -22,7 +22,7 @@ const createCoffeeStore = async (
     try {
       const findCoffeeStoreRecords = await table
         .select({
-          filterByFormula: `id=${id}`,
+          filterByFormula: `id="${id}"`,
         })
         .firstPage()
 

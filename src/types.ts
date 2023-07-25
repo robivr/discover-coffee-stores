@@ -8,6 +8,7 @@ export type CoffeeStoreBase = {
 
 export type CoffeeStore = CoffeeStoreBase & {
   href: string
+  rating: number
 }
 
 export type CoffeeStoreRecord = CoffeeStoreBase & {
