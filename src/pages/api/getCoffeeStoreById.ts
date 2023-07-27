@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 
-import { getMinifiedRecords, table } from '@/lib/airtable'
+import { getMinifiedRecords, table, findRecordByFilter } from '@/lib/airtable'
 import { CoffeeStoreRecord } from '@/types'
 
 type Message = {
@@ -19,14 +19,9 @@ const getCoffeeStoresById = async (
       throw new Error('id required')
     }
 
-    const findCoffeeStoreRecords = await table
-      .select({
-        filterByFormula: `id="${id}"`,
-      })
-      .firstPage()
+    const records = await findRecordByFilter(id as string)
 
-    if (findCoffeeStoreRecords.length > 0) {
-      const records = getMinifiedRecords(findCoffeeStoreRecords)
+    if (records.length > 0) {
       res.json(records)
     } else {
       res.json({ message: `id ${id} could not be found` })
