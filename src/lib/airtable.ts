@@ -8,8 +8,9 @@ const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(
 
 const table = base('coffee-stores')
 
-const getMinifiedRecord = (record: Record<FieldSet>) => {
+export const getMinifiedRecord = (record: Record<FieldSet>) => {
   return {
+    recordId: record.id,
     ...record.fields,
   } as CoffeeStoreRecord
 }

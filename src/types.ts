@@ -13,6 +13,7 @@ export type CoffeeStore = CoffeeStoreBase & {
 
 export type CoffeeStoreRecord = CoffeeStoreBase & {
   rating: number
+  recordId: string
 }
 
 export type FourSquareResult = {

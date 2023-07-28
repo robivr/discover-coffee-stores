@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import Link from 'next/link'
 import Head from 'next/head'
 import Image from 'next/image'
+import useSWR from 'swr'
 import { StoreContext } from '@/store/store-context'
 import { isEmpty } from '@/utils'
 
@@ -93,6 +94,25 @@ const CoffeeStore = (initialProps: CoffeeStoreProps) => {
       handleCreateCoffeeStore(initialProps.coffeeStore)
     }
   }, [coffeeStores, id, initialProps.coffeeStore])
+
+  const fetchCoffeeStore = (url: string) => fetch(url).then((res) => res.json())
+
+  const { data, error } = useSWR(
+    `/api/getCoffeeStoreById?id=${id}`,
+    fetchCoffeeStore,
+  )
+  console.log('SWR', data, error)
+
+  useEffect(() => {
+    if (data && data.length > 0) {
+      setCoffeeStore(data[0])
+      setRatingCount(data[0].rating)
+    }
+  }, [data])
+
+  if (error) {
+    return <div>Something went wrong retrieving cofee store page</div>
+  }
 
   if (router.isFallback) {
     return <div>Loading ...</div>

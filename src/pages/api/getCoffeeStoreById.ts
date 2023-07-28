@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 
-import { getMinifiedRecords, table, findRecordByFilter } from '@/lib/airtable'
+import { findRecordByFilter } from '@/lib/airtable'
 import { CoffeeStoreRecord } from '@/types'
 
 type Message = {
