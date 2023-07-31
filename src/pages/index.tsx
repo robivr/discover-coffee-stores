@@ -36,8 +36,6 @@ export default function Home(props: HomeProps) {
   const { locationErrorMsg, isFindingLocation, handleTrackLocation } =
     useTrackLocation()
 
-  // console.log({ latLong, locationErrorMsg })
-
   useEffect(() => {
     const fetchNearbyStores = async () => {
       if (latLong) {
@@ -46,8 +44,6 @@ export default function Home(props: HomeProps) {
             `/api/getCoffeeStoresByLocation?latLong=${latLong}&limit=30`,
           )
           const fetchedCoffeeStores = await res.json()
-
-          console.log('fetched coffee stores', { fetchedCoffeeStores })
 
           dispatch({
             type: ACTION_TYPES.SET_COFFEE_STORES,
@@ -67,7 +63,6 @@ export default function Home(props: HomeProps) {
   }, [latLong, dispatch])
 
   const handleOnBannerButtonClick = () => {
-    console.log('clicked the banner button')
     handleTrackLocation()
   }
 

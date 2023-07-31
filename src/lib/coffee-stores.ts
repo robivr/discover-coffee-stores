@@ -24,7 +24,6 @@ const getListOfCoffeeStorePhotos = async () => {
   const unsplashResults = photos.response?.results.map(
     (result) => result.urls['small'],
   )
-  // console.log('unsplash', unsplashResults)
 
   return unsplashResults
 }

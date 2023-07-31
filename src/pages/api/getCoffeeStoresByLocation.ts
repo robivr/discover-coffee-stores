@@ -15,7 +15,6 @@ const getCoffeeStoresByLocation = async (
   try {
     const latLong = req.query.latLong as string
     const limit = Number(req.query.limit as string)
-    console.log('API', latLong, limit)
     const response = await fetchCoffeeStores(latLong, limit)
 
     res.status(200).json({ coffeeStores: response })

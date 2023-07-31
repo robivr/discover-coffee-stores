@@ -13,7 +13,6 @@ import { CoffeeStore } from '@/types'
 import styles from '@/styles/coffee-store.module.css'
 
 export async function getStaticProps({ params }: { params: { id: string } }) {
-  console.log('params', params)
   const coffeeStores = await fetchCoffeeStores()
   const findCoffeeStoreById = coffeeStores.find(
     (coffeeStore: CoffeeStore) => coffeeStore.id.toString() === params.id,
@@ -46,7 +45,7 @@ const CoffeeStore = (initialProps: CoffeeStoreProps) => {
   const id = router.query.id
 
   const [coffeeStore, setCoffeeStore] = useState(initialProps.coffeeStore)
-  const [ratingCount, setRatingCount] = useState(1)
+  const [ratingCount, setRatingCount] = useState(0)
 
   const {
     state: { coffeeStores },
@@ -72,7 +71,6 @@ const CoffeeStore = (initialProps: CoffeeStoreProps) => {
       })
 
       const dbCoffeeStore = await response.json()
-      console.log(dbCoffeeStore)
     } catch (err) {
       console.error('Error creating coffee store', err)
     }
@@ -101,7 +99,6 @@ const CoffeeStore = (initialProps: CoffeeStoreProps) => {
     `/api/getCoffeeStoreById?id=${id}`,
     fetchCoffeeStore,
   )
-  console.log('SWR', data, error)
 
   useEffect(() => {
     if (data && data.length > 0) {
@@ -120,8 +117,28 @@ const CoffeeStore = (initialProps: CoffeeStoreProps) => {
 
   const { imgUrl, name, address, locality } = coffeeStore
 
-  const handleUpvoteButton = () => {
-    setRatingCount(ratingCount + 1)
+  const handleUpvoteButton = async () => {
+    try {
+      const { id } = coffeeStore
+
+      const response = await fetch('/api/favoriteCoffeeStoreById', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id,
+        }),
+      })
+
+      const dbCoffeeStore = await response.json()
+
+      if (dbCoffeeStore?.length > 0) {
+        setRatingCount(ratingCount + 1)
+      }
+    } catch (err) {
+      console.error('Error upvoting coffee store', err)
+    }
   }
 
   return (
